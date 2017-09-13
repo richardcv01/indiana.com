@@ -70,7 +70,39 @@ def get_item(page_content, url):
             return item
         # Если вдруг какая-либо часть информации на странице не найдена, то возвращаем None
         return None
-    urls = get("//div[@class='pro-cover-photos']/a/@href")
+    #urls = get("//div[@class='pro-cover-photos']/a/@href")
+    try:
+        Company_Name = get("//div[@class='pro-name']/text()")[0]
+    except (IndexError, UnboundLocalError):
+        Company_Name = ""
+    try:
+        City = get("//span[@itemprop='addressLocality']/a/text()")[0]
+    except (IndexError, UnboundLocalError):
+        City = ""
+    try:
+        State = get("//span[@itemprop='addressRegion']/text()")[0]
+    except (IndexError, UnboundLocalError):
+        State = ""
+    try:
+        Postcode = get("//span[@itemprop='postalCode']/text()")[0]
+    except (IndexError, UnboundLocalError):
+        Postcode = ""
+    try:
+        Telephone = get("//span[@class='pro-contact-text']/text()")[0]
+    except (IndexError, UnboundLocalError):
+        Telephone = ""
+    try:
+        Website = get("//a[@class='proWebsiteLink']/@href")[0]
+    except (IndexError, UnboundLocalError):
+        Website = ""
+    dic = dict()
+    dic['Company_Name'] = Company_Name
+    dic['City'] = City
+    dic['State'] = State
+    dic['Postcode'] = Postcode
+    dic['Telephone'] = Telephone
+    dic['Website'] = Website
+    list_data.append(dic)
     #urls_full.append(urls)
     return urls
 
