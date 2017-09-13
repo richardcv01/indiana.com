@@ -4,6 +4,8 @@ from aiohttp import ClientSession
 from lxml import html
 import itertools
 import csv
+import sys
+import io
 
 def get_url_page(count=1):
     """
@@ -193,7 +195,8 @@ class get_data():
 def write_csw(data):
     FILENAME = "data.csv"
 
-    with open(FILENAME, "w", newline="") as file:
+    with io.open(FILENAME, "a", encoding="utf-8") as file:
+    #with open(FILENAME, "w", newline="") as file:
         columns = ["Company_Name", "City", "State", "Postcode", "Telephone", "Website"]
         writer = csv.DictWriter(file, fieldnames=columns)
         writer.writeheader()
@@ -206,13 +209,12 @@ if __name__ == "__main__":
     urls = S.main()
     print(len(urls))
     set_urls = set(urls)
-    urls = set_urls
-    print(len(urls))
+    urls = list(set_urls)
+    print(urls)
 
-    #urls = ['https://www.houzz.com.au/pro/kelliedoolan/novara-homes',
-            #'https://www.houzz.com.au/pro/67dallas/demax-constructions']
-    SS = get_data(urls)
+    url = urls[0:1000]
+    SS = get_data(url)
     data = SS.main()
-    print(data[0])
+    print(data)
     write_csw(data)
     print('write data ok')
