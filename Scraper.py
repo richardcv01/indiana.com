@@ -3,7 +3,7 @@ import asyncio
 from aiohttp import ClientSession
 from lxml import html
 import itertools
-
+import csv
 
 def get_url_page(count=1):
     """
@@ -153,30 +153,28 @@ class get_data():
         if City == None:
             City = [""]
 
+        State = get("//span[@itemprop='addressRegion']/text()")
+        if State == None:
+           State = [""]
 
-        try:
-            State = get("//span[@itemprop='addressRegion']/text()")
-        except (IndexError, UnboundLocalError):
-           State = ""
-        try:
-           Postcode = get("//span[@itemprop='postalCode']/text()")
-        except (IndexError, UnboundLocalError):
-           Postcode = ""
-        try:
-           Telephone = get("//span[@class='pro-contact-text']/text()")
-        except (IndexError, UnboundLocalError):
-           Telephone = ""
-        try:
-           Website = get("//a[@class='proWebsiteLink']/@href")
-        except (IndexError, UnboundLocalError):
-           Website = ""
+        Postcode = get("//span[@itemprop='postalCode']/text()")
+        if Postcode == None:
+           Postcode = [""]
+
+        Telephone = get("//span[@class='pro-contact-text']/text()")
+        if Telephone == None:
+           Telephone = [""]
+
+        Website = get("//a[@class='proWebsiteLink']/@href")
+        if Website == None:
+           Website = [""]
         dic = dict()
         dic['Company_Name'] = Company_Name[0]
         dic['City'] = City[0]
         dic['State'] = State[0]
-        dic['Postcode'] = Postcode
-        dic['Telephone'] = Telephone
-        dic['Website'] = Website
+        dic['Postcode'] = Postcode[0]
+        dic['Telephone'] = Telephone[0]
+        dic['Website'] = Website[0]
         self.list_data.append(dic)
         # urls_full.append(urls)
         return urls
@@ -192,8 +190,18 @@ class get_data():
         data = self.list_data
         return data
 
+def write_csw(data):
+    FILENAME = "data.csv"
+
+    with open(FILENAME, "w", newline="") as file:
+        columns = ["Company_Name", "City", "State", "Postcode", "Telephone", "Website"]
+        writer = csv.DictWriter(file, fieldnames=columns)
+        writer.writeheader()
+        # запись нескольких строк
+        writer.writerows(data)
+
 if __name__ == "__main__":
-    urls_page = get_url_page(50)
+    urls_page = get_url_page(350)
     S = get_urls(urls_page)
     urls = S.main()
     print(len(urls))
@@ -205,4 +213,6 @@ if __name__ == "__main__":
             #'https://www.houzz.com.au/pro/67dallas/demax-constructions']
     SS = get_data(urls)
     data = SS.main()
-    print(data)
+    print(data[0])
+    write_csw(data)
+    print('write data ok')
